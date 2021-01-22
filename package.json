@@ -1,0 +1,34 @@
+{
+  "name": "carousel",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "main": "src/index.js",
+  "dependencies": {
+    "@react-spring/three": "9.0.0-rc.3",
+    "@react-three/drei": "2.2.16",
+    "lerp": "1.0.3",
+    "lethargy": "1.0.9",
+    "nice-color-palettes": "3.0.0",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "react-scripts": "4.0.1",
+    "react-three-fiber": "5.3.11",
+    "react-use-gesture": "9.0.0",
+    "three": "0.124.0",
+    "zustand": "3.3.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
