@@ -39,7 +39,7 @@ export default function Model(props) {
         ))}
       </group>
       <Screen />
-      <mesh receiveShadow castShadow material={materials.black} geometry={nodes.Cube.geometry} position={[0, 1, 0]}/>
+      <mesh receiveShadow castShadow material={materials.black} geometry={nodes.Cube.geometry} position={[0, 1, 0]} material-envMapIntensity={0.5}/>
     </group>
   )
 }

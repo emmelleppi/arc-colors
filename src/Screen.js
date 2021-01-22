@@ -20,7 +20,7 @@ export default function Screen() {
 
   useEffect(() => {
     springRef.current.start({
-      posX: wheelOpen ? 10 : 0,
+      posX: wheelOpen ? 6 : 0,
       delay: wheelOpen ? 0 : 1500,
       onRest: () => setLocalOpen(true)
     })
@@ -28,7 +28,7 @@ export default function Screen() {
 
   return (
       <group position-y={1} dispose={null} >
-        <mesh material={materials.Material} material-color="black" geometry={nodes.Slice001.geometry} position={[0.8, 0.39, -0.91]} />
+        <mesh material={materials.Material} material-color="black" geometry={nodes.Slice001.geometry} position={[0.8, 0.39, -0.91]} material-transparent={true} />
         <a.mesh receiveShadow castShadow geometry={nodes.Slice.geometry} renderOrder={1} position-x={posX} >
           <meshPhysicalMaterial transmission={2} metalness={0.2} clearcoat={1} roughness={0} transparent color="white" />
         </a.mesh>
