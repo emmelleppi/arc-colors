@@ -157,9 +157,9 @@ function App() {
   })
 
   return (
-    <Canvas {...bind()} orthographic shadowMap camera={{ zoom: 70, position:[0,0,50] }}>
+    <Canvas {...bind()} orthographic shadowMap camera={{ zoom: 70, position:[0,-12,50] }}>
       <color attach="background" args={['#333']} />
-      <group rotation-y={-Math.PI/4}>
+      <group rotation={[Math.PI/8,-Math.PI/3,0]}>
         <Scene />
         <Suspense fallback={null}>
           <Model position={[-2.5,-2.5,0]} scale={[1.8,1.8,1.8]} />
