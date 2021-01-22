@@ -19,27 +19,28 @@ function Cylinder(props) {
   )
   return (
     <mesh castShadow receiveShadow onClick={handleClick} {...props}>
+      <cylinderBufferGeometry args={[0.146,0.146,2,32,4]} />
       <meshPhysicalMaterial metalness={0.8} roughness={1} color={palette[color]} />
     </mesh>
   )
 }
 
 export default function Model(props) {
-  const { nodes, materials } = useGLTF('/Color.gltf')
+  const { nodes, materials } = useGLTF('/Color3.gltf')
 
   return (
     <group {...props} dispose={null}>
-      <group position={[-0.54, 1.08, 1.69]}>
+      <group position={[-0, 1.09, 0.25]} >
         {new Array(36).fill().map((_, index) => (
           <Cylinder
             key={`0${index}`}
-            geometry={nodes[`Cylinder${index === 0 ? '' : index < 10 ? `00${index}` : `0${index}`}`].geometry}
+            position={[0, (index%6)/3.4, Math.floor(index/6)/3.4]}
             rotation={[0, 0, -Math.PI / 2]}
           />
         ))}
       </group>
       <Screen />
-      <mesh receiveShadow castShadow material={materials.black} geometry={nodes.Cube.geometry} position={[0, 1, 0]} material-envMapIntensity={0.5}/>
+      <mesh receiveShadow castShadow material={materials.black} geometry={nodes.Cube.geometry} position={[0, 1, 0]} rotation-x={Math.PI/2} material-envMapIntensity={0.5}/>
     </group>
   )
 }

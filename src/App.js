@@ -12,7 +12,7 @@ import { MAX_INDEX, NUM, useWheel } from './store'
 import './styles.css'
 
 extend({ RoundedBoxBufferGeometry })
-softShadows()
+
 function easeInOutExpo(x) {
   return x === 0 ? 0 : x === 1 ? 1 : x < 0.5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2
 }
@@ -69,7 +69,7 @@ function Thing({ color, opacity, ...props }) {
       {...props}>
       {color.map((c, i) => (
         <mesh receiveShadow castShadow key={`0${i}`} position-x={(i - 2.5) / 3.3} renderOrder={0} visible={opacity > 0.01}>
-          <roundedBoxBufferGeometry args={[0.37, 0.8, 0.1]} />
+          <roundedBoxBufferGeometry args={[0.45, 0.8, 0.2]} />
           <a.meshStandardMaterial color={c} transparent opacity={springOpacity} envMapIntensity={0.5} />
         </mesh>
       ))}
@@ -157,17 +157,16 @@ export default function App() {
 
   return (
     <>
-      <Canvas concurrent pixelRatio={[1,1.5]} {...bind()} orthographic shadowMap camera={{ zoom: 70, position: [0, -12, 50] }}>
-        <fog attach="fog" args={['#333', 50, 70]} />
-        <color attach="background" args={['#333']} />
-        <group rotation={[Math.PI / 8, -Math.PI / 3, 0]}>
+      <Canvas concurrent pixelRatio={[1,2]} {...bind()} orthographic shadowMap camera={{ zoom: 70, position: [0, -12, 50] }}>
+        <color attach="background" args={['#222']} />
+        <group rotation={[Math.PI / 8, -Math.PI / 3, 0]} position-x={1}>
           <Scene />
           <Suspense fallback={null}>
             <Model position={[-2.5, -2.5, 0]} scale={[1.8, 1.8, 1.8]} />
             <Environment preset="studio" />
           </Suspense>
           <Plane args={[40,40]} receiveShadow position-y={-2.5} rotation-x={-Math.PI/2}>
-            <shadowMaterial color="#333"  />
+            <shadowMaterial color="#282828"  />
           </Plane>
         </group>
         <ambientLight  intensity={0.3}/>
@@ -175,8 +174,8 @@ export default function App() {
           position={[30, 5, 20]}
           castShadow
           intensity={1}
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
+          shadow-mapSize-width={518}
+          shadow-mapSize-height={518}
         />
       </Canvas>
       <Stats />
