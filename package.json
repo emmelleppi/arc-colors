@@ -10,6 +10,7 @@
     "lerp": "1.0.3",
     "lethargy": "1.0.9",
     "nice-color-palettes": "3.0.0",
+    "postprocessing": "^6.20.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-scripts": "4.0.1",
