@@ -18,6 +18,8 @@
     "react-three-fiber": "5.3.11",
     "react-use-gesture": "9.0.0",
     "three": "0.124.0",
+    "tweakpane": "^1.5.8",
+    "use-tweaks": "^0.3.1",
     "zustand": "3.3.1"
   },
   "devDependencies": {},

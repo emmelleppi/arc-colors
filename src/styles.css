@@ -10,5 +10,5 @@ body,
   margin: 0;
   padding: 0;
   overflow: auto;
-  background: radial-gradient(ellipse at 70% 80%, rgb(102, 102, 102) 20%, rgb(170, 170, 170) 110%);
+  background: radial-gradient(ellipse at 50% 80%,rgb(119, 119, 119) 0%, rgb(56, 56, 56) 100%);
 }

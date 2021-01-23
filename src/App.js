@@ -121,8 +121,8 @@ export default function App() {
         pixelRatio={[1, 1.5]}
         {...bind()}
         shadowMap
-        camera={{ fov: 25, far: 100, position: [0, -12, 50], zoom: 1.5 }}>
-        <group rotation={[Math.PI / 8, -Math.PI / 3, 0]} position-x={0}>
+        camera={{ fov: 20, far: 100, position: [0, -10, 50], zoom: 1.5 }}>
+        <group rotation={[Math.PI / 8, -Math.PI / 3.2, 0]} position-x={0}>
           <Suspense fallback={null}>
             <Scene />
             <Model position={[-2.5, -2.5, 0]} scale={[1.8, 1.8, 1.8]} />
