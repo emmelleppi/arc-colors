@@ -7,6 +7,7 @@
   "dependencies": {
     "@react-spring/three": "9.0.0-rc.3",
     "@react-three/drei": "2.2.16",
+    "immer": "^8.0.1",
     "lerp": "1.0.3",
     "lethargy": "1.0.9",
     "nice-color-palettes": "3.0.0",

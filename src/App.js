@@ -170,13 +170,6 @@ export default function App() {
           </Plane>
         </group>
         <ambientLight  intensity={0.3}/>
-        <directionalLight
-          position={[30, 5, 20]}
-          castShadow
-          intensity={1}
-          shadow-mapSize-width={518}
-          shadow-mapSize-height={518}
-        />
       </Canvas>
       <Stats />
       <Loader />
