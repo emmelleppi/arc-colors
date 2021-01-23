@@ -118,7 +118,7 @@ export default function App() {
       <Canvas
         concurrent
         gl={{ powerPreference: 'high-performance' }}
-        pixelRatio={[1, 2]}
+        pixelRatio={[1, 1.5]}
         {...bind()}
         shadowMap
         camera={{ fov: 25, far: 100, position: [0, -12, 50], zoom: 1.5 }}>
