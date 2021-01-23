@@ -9,4 +9,6 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow: auto;
+  background: radial-gradient(ellipse at 70% 80%, rgb(102, 102, 102) 20%, rgb(170, 170, 170) 110%);
 }

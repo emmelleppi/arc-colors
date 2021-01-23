@@ -6,7 +6,8 @@ import React, { useCallback, useState } from 'react'
 import { useGLTF } from '@react-three/drei/useGLTF'
 import produce from 'immer'
 import { useWheel } from './store'
-import Screen from "./Screen"
+import Screen from './Screen'
+import { useNormalTexture } from '@react-three/drei'
 
 function Cylinder({ i, ...props }) {
   const paletteIndex = useWheel(state => state.colors[i])
@@ -20,29 +21,29 @@ function Cylinder({ i, ...props }) {
 
   return (
     <mesh castShadow receiveShadow onClick={handleClick} {...props}>
-      <cylinderBufferGeometry args={[0.146,0.146,2,32,4]} />
-      <meshPhysicalMaterial metalness={0.8} roughness={1} color={palette[paletteIndex]} />
+      <meshPhysicalMaterial metalness={0.8} roughness={0.8} color={palette[color]} />
     </mesh>
   )
 }
 
 export default function Model(props) {
-  const { nodes, materials } = useGLTF('/Color3.gltf')
-
+  const { nodes } = useGLTF('/Color3.gltf')
   return (
     <group {...props} dispose={null}>
-      <group position={[-0, 1.09, 0.25]} >
+      <group position={[-0.54, 1.08, 1.69]}>
         {new Array(36).fill().map((_, index) => (
           <Cylinder
             key={`0${index}`}
             i={index}
-            position={[0, (index%6)/3.4, Math.floor(index/6)/3.4]}
-            rotation={[0, 0, -Math.PI / 2]}
+            rotation={[0, -Math.PI / 2, -Math.PI / 2]}
+            geometry={nodes[`Cylinder${index === 0 ? '' : index < 10 ? `00${index}` : `0${index}`}`].geometry}
           />
         ))}
       </group>
       <Screen />
-      <mesh receiveShadow castShadow material={materials.black} geometry={nodes.Cube.geometry} position={[0, 1, 0]} rotation-x={Math.PI/2} material-envMapIntensity={0.5}/>
+      <mesh castShadow geometry={nodes.Cube.geometry} position={[0, 1, 0]} rotation-x={Math.PI / 2}>
+        <meshPhysicalMaterial metalness={0.8} roughness={0.8} color="#777" />
+      </mesh>
     </group>
   )
 }

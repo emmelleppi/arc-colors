@@ -1,81 +1,23 @@
-import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { Canvas, extend, useFrame } from 'react-three-fiber'
-import lerp from 'lerp'
-import { RoundedBoxBufferGeometry } from 'three/examples/jsm/geometries/RoundedBoxBufferGeometry'
+import React, { Suspense, useMemo, useRef } from 'react'
+import { Canvas, extend } from 'react-three-fiber'
 import niceColorPalette from 'nice-color-palettes/1000'
 import { useSpring, a, useChain } from '@react-spring/three'
 import { Lethargy } from 'lethargy'
 import { useWheel as useGestureWheel } from 'react-use-gesture'
 import Model from './Color'
-import { Environment, Loader, Plane, softShadows, Stats } from '@react-three/drei'
+import { Environment, Loader, OrbitControls, Plane, Stats } from '@react-three/drei'
 import { MAX_INDEX, NUM, useWheel } from './store'
+import usePostprocessing from './shaders/usePostprocessing'
+import useReflector from './shaders/useReflector'
+import Screen from './Screen'
+import './shaders/materials/ReflectorMaterial'
 import './styles.css'
-
-extend({ RoundedBoxBufferGeometry })
 
 function easeInOutExpo(x) {
   return x === 0 ? 0 : x === 1 ? 1 : x < 0.5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2
 }
 
 const lethargy = new Lethargy()
-
-function Thing({ color, opacity, ...props }) {
-  const ref = useRef()
-  const scale = opacity === 1 ? 1.4 : 1
-  const toggle = useWheel((s) => s.toggleWheel)
-  const wheelOpen = useWheel((s) => s.wheelOpen)
-  const setPalette = useWheel((s) => s.setPalette)
-  const [localOpen, setLocalOpen] = useState(wheelOpen)
-
-  useFrame(() => {
-    const newScale = lerp(ref.current.scale.x, scale, 0.1)
-    ref.current.scale.set(newScale, newScale, newScale)
-  })
-  const springOpacityRef = useRef()
-  const { springOpacity } = useSpring({
-    ref: springOpacityRef,
-    springOpacity: opacity
-  })
-
-  useEffect(() => {
-    if (localOpen) {
-      springOpacityRef.current.start({
-        springOpacity: opacity
-      })
-      if (!wheelOpen) {
-        setLocalOpen(false)
-      }
-    } else {
-      springOpacityRef.current.start({
-        springOpacity: opacity,
-        delay: wheelOpen ? 1000 : 0,
-        onRest: () => setLocalOpen(true)
-      })
-    }
-    if (opacity === 1) {
-      setPalette(color)
-    }
-  }, [localOpen, setLocalOpen, wheelOpen, opacity, setPalette, color])
-
-  return (
-    <group
-      onClick={(e) => {
-        e.stopPropagation()
-        if (opacity === 1) {
-          toggle()
-        }
-      }}
-      ref={ref}
-      {...props}>
-      {color.map((c, i) => (
-        <mesh receiveShadow castShadow key={`0${i}`} position-x={(i - 2.5) / 3.3} renderOrder={0} visible={opacity > 0.01}>
-          <roundedBoxBufferGeometry args={[0.45, 0.8, 0.2]} />
-          <a.meshStandardMaterial color={c} transparent opacity={springOpacity} envMapIntensity={0.5} />
-        </mesh>
-      ))}
-    </group>
-  )
-}
 
 function Scene() {
   const springRotY = useRef()
@@ -108,12 +50,12 @@ function Scene() {
 
   const { rotY } = useSpring({
     ref: springRotY,
-    rotY: wheelOpen ? 0 : Math.PI / 2
+    rotY: wheelOpen ? Math.PI / 3 : Math.PI / 2
   })
   const { posX, posZ } = useSpring({
     ref: springPosX,
-    posX: wheelOpen ? 6 : -3,
-    posZ: wheelOpen ? 0 : -1.9
+    posX: wheelOpen ? 3 : -3,
+    posZ: wheelOpen ? -4 : -1.9
   })
   const { rotX } = useSpring({
     rotX: _weel
@@ -124,7 +66,7 @@ function Scene() {
     <a.group position-x={posX} position-z={posZ} rotation-y={rotY}>
       <a.group rotation-x={rotX}>
         {positions.map((pos, index) => (
-          <Thing
+          <Screen
             key={`0${index}`}
             position={pos}
             color={niceColorPalette[colors[index]]}
@@ -137,10 +79,26 @@ function Scene() {
   )
 }
 
+function Floor() {
+  const [meshRef, floorRef, reflectorProps, passes] = useReflector()
+  usePostprocessing(passes)
+  return (
+    <group position-y={-2.5} rotation-x={-Math.PI / 2}>
+      <Plane ref={meshRef} args={[40, 22]} position={[0, 0, -0.001]}>
+        <reflectorMaterial transparent opacity={0.7} color="black" {...reflectorProps} />
+      </Plane>
+      <Plane ref={floorRef} args={[70, 70]} receiveShadow>
+        <shadowMaterial color="#111" transparent opacity={0.2} />
+      </Plane>
+    </group>
+  )
+}
+
 export default function App() {
   const wheelOpen = useWheel((s) => s.wheelOpen)
   const increaseWheelIndex = useWheel((s) => s.increaseWheelIndex)
   const decreaseWheelIndex = useWheel((s) => s.decreaseWheelIndex)
+
   const bind = useGestureWheel(({ event, last, memo: wait }) => {
     if (!last && wheelOpen) {
       const s = lethargy.check(event)
@@ -157,19 +115,35 @@ export default function App() {
 
   return (
     <>
-      <Canvas concurrent pixelRatio={[1,2]} {...bind()} orthographic shadowMap camera={{ zoom: 70, position: [0, -12, 50] }}>
-        <color attach="background" args={['#222']} />
-        <group rotation={[Math.PI / 8, -Math.PI / 3, 0]} position-x={1}>
-          <Scene />
+      <Canvas
+        concurrent
+        gl={{ powerPreference: 'high-performance' }}
+        pixelRatio={[1, 1.5]}
+        {...bind()}
+        shadowMap
+        camera={{ fov: 25, far: 100, position: [0, -12, 50], zoom: 1.5 }}>
+        <group rotation={[Math.PI / 8, -Math.PI / 3, 0]} position-x={0}>
           <Suspense fallback={null}>
+            <Scene />
             <Model position={[-2.5, -2.5, 0]} scale={[1.8, 1.8, 1.8]} />
-            <Environment preset="studio" />
+            <Environment files="adams_place_bridge_1k.hdr" />
+            <Floor />
           </Suspense>
-          <Plane args={[40,40]} receiveShadow position-y={-2.5} rotation-x={-Math.PI/2}>
-            <shadowMaterial color="#282828"  />
-          </Plane>
         </group>
-        <ambientLight  intensity={0.3}/>
+
+        <ambientLight intensity={0.1} />
+        <spotLight
+          position={[20, 1, 10]}
+          intensity={1.5}
+          castShadow
+          penumbra={1}
+          distance={60}
+          angle={Math.PI / 6}
+          shadow-mapSize-width={518}
+          shadow-mapSize-height={518}
+        />
+        <spotLight position={[10, 40, 0]} intensity={5} penumbra={1} distance={45} angle={Math.PI / 3} />
+
       </Canvas>
       <Stats />
       <Loader />
