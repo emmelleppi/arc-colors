@@ -80,17 +80,13 @@ function Scene() {
 }
 
 function Floor() {
-  const { nodes, materials } = useGLTF('/colors.glb')
-  const [meshRef, floorRef, reflectorProps, passes] = useReflector()
+  const [meshRef, reflectorProps, passes] = useReflector()
   usePostprocessing(passes)
   return (
     <group position-y={-2.5} rotation-x={-Math.PI / 2}>
       <Plane ref={meshRef} args={[40, 40]} position={[0, 0, -0.001]}>
-        <reflectorMaterial transparent opacity={0.7} color="#000" {...reflectorProps} />
+        <reflectorMaterial transparent opacity={0.5} color="#000" {...reflectorProps} />
       </Plane>
-      <mesh ref={floorRef} position={[-2.3, -0.1, -0.01]} rotation-x={Math.PI / 2} scale={[1.8, 1.8, 1.8]} geometry={nodes.Plane.geometry}>
-        <primitive object={materials['Plane-mat']} attach="material" metalness={1} roughness={1} />
-      </mesh>
     </group>
   )
 }
@@ -122,7 +118,7 @@ export default function App() {
         gl={{ powerPreference: 'high-performance', antialias: false, stencil: false, depth: false, alpha: false }}
         {...bind()}
         camera={{ fov: 20, far: 100, position: [0, -10, 50], zoom: 1.5 }}>
-        <fog attach="fog" args={['#000', 55, 65]} />
+        {/* <fog attach="fog" args={['#000', 55, 65]} /> */}
         <color attach="background" args={['#000']} />
         <group rotation={[Math.PI / 8, -Math.PI / 3.2, 0]} position-x={0}>
           <Suspense fallback={null}>

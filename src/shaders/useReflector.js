@@ -5,7 +5,6 @@ import { useResource, useThree } from 'react-three-fiber'
 
 export default function useReflector(textureWidth = 64, textureHeight = 64) {
   const meshRef = useResource()
-  const floorRef = useResource()
   const [reflectorPlane] = useState(() => new THREE.Plane())
   const [normal] = useState(() => new THREE.Vector3())
   const [reflectorWorldPosition] = useState(() => new THREE.Vector3())
@@ -23,7 +22,6 @@ export default function useReflector(textureWidth = 64, textureHeight = 64) {
   const beforeRender = useCallback(() => {
     if (!meshRef.current) return
     meshRef.current.visible = false
-    floorRef.current.visible = false
     reflectorWorldPosition.setFromMatrixPosition(meshRef.current.matrixWorld)
     cameraWorldPosition.setFromMatrixPosition(camera.matrixWorld)
 
@@ -94,7 +92,6 @@ export default function useReflector(textureWidth = 64, textureHeight = 64) {
   function afterRender() {
     if (!meshRef.current) return
     meshRef.current.visible = true
-    floorRef.current.visible = true
   }
 
   const [passes, props] = useMemo(() => {
@@ -113,5 +110,5 @@ export default function useReflector(textureWidth = 64, textureHeight = 64) {
     return [[lambdaPassBefore, renderPass, blurPass, savePass, lambdaPassAfter], { textureMatrix, tDiffuse: savePass.renderTarget.texture }]
   }, [size])
 
-  return [meshRef, floorRef, props, passes]
+  return [meshRef, props, passes]
 }
