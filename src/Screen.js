@@ -17,6 +17,7 @@ export default function Screen({ color, opacity, ...props }) {
   const wheelOpen = useWheel((s) => s.wheelOpen)
   const setPalette = useWheel((s) => s.setPalette)
   const [localOpen, setLocalOpen] = useState(wheelOpen)
+  const [isVisible, setIsVisible] = useState(false)
 
   useFrame(() => {
     const newScale = lerp(ref.current.scale.x, scale, 0.1)
@@ -28,29 +29,30 @@ export default function Screen({ color, opacity, ...props }) {
     springOpacity: opacity
   })
 
-  useEffect(() => {
+  useEffect(async () => {
     if (localOpen) {
-      springOpacityRef.current.start({
+      await springOpacityRef.current.start({
         springOpacity: opacity
       })
       if (!wheelOpen) {
         setLocalOpen(false)
+        setIsVisible(false)
       }
     } else {
-      springOpacityRef.current.start({
+      await springOpacityRef.current.start({
         springOpacity: opacity,
-        delay: wheelOpen ? 1000 : 0,
+        onStart: () => setIsVisible(true),
         onRest: () => setLocalOpen(true)
       })
     }
     if (opacity === 1) {
       setPalette(color)
     }
-  }, [localOpen, setLocalOpen, wheelOpen, opacity, setPalette, color])
+  }, [localOpen, setIsVisible, setLocalOpen, wheelOpen, opacity, setPalette, color])
 
   return (
     <group
-      visible={opacity > 0.01}
+      visible={opacity > 0.01 && (isVisible || opacity === 1)}
       onClick={(e) => {
         e.stopPropagation()
         if (opacity === 1) {

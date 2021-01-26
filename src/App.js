@@ -54,7 +54,7 @@ function Scene() {
   })
   const { posX, posZ } = useSpring({
     ref: springPosX,
-    posX: wheelOpen ? 3 : -3,
+    posX: wheelOpen ? 2 : -3,
     posZ: wheelOpen ? -4 : -1.9
   })
   const { rotX } = useSpring({
@@ -85,16 +85,11 @@ function Floor() {
   usePostprocessing(passes)
   return (
     <group position-y={-2.5} rotation-x={-Math.PI / 2}>
-      <Plane ref={meshRef} args={[40, 22]} position={[0, 0, -0.001]}>
-        <reflectorMaterial transparent opacity={1} color="black" {...reflectorProps} />
+      <Plane ref={meshRef} args={[40, 40]} position={[0, 0, -0.001]}>
+        <reflectorMaterial transparent opacity={0.7} color="#000" {...reflectorProps} />
       </Plane>
-      <mesh
-        ref={floorRef}
-        position={[-2.3, -0.1, -0.01]}
-        rotation-x={Math.PI / 2}
-        scale={[1.8,1.8,1.8]}
-        geometry={nodes.Plane.geometry}>
-        <primitive object={materials['Plane-mat']} attach="material" metalness={0} roughness={1} color="#555" />
+      <mesh ref={floorRef} position={[-2.3, -0.1, -0.01]} rotation-x={Math.PI / 2} scale={[1.8, 1.8, 1.8]} geometry={nodes.Plane.geometry}>
+        <primitive object={materials['Plane-mat']} attach="material" metalness={1} roughness={1} />
       </mesh>
     </group>
   )
@@ -123,11 +118,11 @@ export default function App() {
     <>
       <Canvas
         concurrent
-        gl={{ powerPreference: 'high-performance' }}
         pixelRatio={[1, 1.5]}
+        gl={{ powerPreference: 'high-performance', antialias: false, stencil: false, depth: false, alpha: false }}
         {...bind()}
-        camera={{ fov: 20, far: 100, position: [0, -10, 50], zoom: 1.75 }}>
-        <fog attach="fog" args={['#000', 60, 70]} />
+        camera={{ fov: 20, far: 100, position: [0, -10, 50], zoom: 1.5 }}>
+        <fog attach="fog" args={['#000', 55, 65]} />
         <color attach="background" args={['#000']} />
         <group rotation={[Math.PI / 8, -Math.PI / 3.2, 0]} position-x={0}>
           <Suspense fallback={null}>
@@ -137,7 +132,8 @@ export default function App() {
             <Floor />
           </Suspense>
         </group>
-        <ambientLight intensity={1.5} />
+        <ambientLight intensity={0.5} />
+        <spotLight intensity={1} position={[10, 0, 10]} penumbra={0.1} angle={Math.PI / 4} distance={30} />
       </Canvas>
       <Stats />
       <Loader />

@@ -42,8 +42,8 @@ class ReflectorMaterial extends MeshBasicMaterial {
         vec3 coord = my_vUv.xyz / my_vUv.w;
         vec4 base = sRGBToLinear(texture2DProj( tDiffuse, my_vUv ));
         gl_FragColor.rgb += base.rgb;
-        float gray = dot(base.rgb, vec3(0.299, 0.587, 0.114));
-        gl_FragColor.a = opacity * smoothstep(0.01, 1.0, gray);
+        // float gray = dot(base.rgb, vec3(0.299, 0.587, 0.114));
+        // gl_FragColor.a = opacity * smoothstep(-0.005, 0.03, gray);
       `
     )
   }

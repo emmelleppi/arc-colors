@@ -3,7 +3,7 @@ import niceColorPalette from 'nice-color-palettes/1000'
 import produce from 'immer'
 
 export const MAX_INDEX = 900
-export const INIT_INDEX = MAX_INDEX / 2
+export const INIT_INDEX = MAX_INDEX / 2 + (Math.random() > 0.5 ? -1 : 1) * Math.round(200 * Math.random())
 export const NUM = 8
 
 const persist = (config) => (set, get, api) =>

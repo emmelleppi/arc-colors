@@ -32,7 +32,6 @@ function Cylinder({ i, material, ...props }) {
 export default function Model(props) {
   const { nodes, materials } = useGLTF('/colors.glb')
   const { nodes: screenNode } = useGLTF('/Screen.gltf')
-
   return (
     <group {...props} dispose={null}>
       <group position={[-0.54, 1.08, 1.69]}>
@@ -40,19 +39,19 @@ export default function Model(props) {
           <Cylinder
             key={`0${index}`}
             i={index}
-            rotation-x={Math.PI/2}
-            rotation-y={-Math.PI/2}
+            rotation-x={Math.PI / 2}
+            rotation-y={-Math.PI / 2}
             geometry={nodes[`Cylinder${index === 0 ? '' : index < 10 ? `00${index}` : `0${index}`}`].geometry}
-            material={materials[`Material.${index===0 ? "037" : (index+1) < 10 ? `00${index+1}` : `0${index+1}`}`]}
+            material={materials[`Material.${index === 0 ? '037' : index + 1 < 10 ? `00${index + 1}` : `0${index + 1}`}`]}
           />
         ))}
       </group>
       <Screen />
-      <mesh geometry={nodes.Cube.geometry} position={[0, 1, 0]} rotation-x={Math.PI/2}>
+      <mesh geometry={nodes.Cube.geometry} position={[0, 1, 0]} rotation-x={Math.PI / 2}>
         <primitive object={materials.black} attach="material" metalness={0} roughness={0.5} />
       </mesh>
-      <mesh geometry={screenNode.Slice.geometry} position={[1.79, 1.789, 0.01]} rotation={[0,0,3.14]} scale={[0.999,0.999,0.999]} >
-        <meshPhysicalMaterial color="#222222" roughness={1} side={BackSide}/>
+      <mesh geometry={screenNode.Slice.geometry} position={[1.79, 1.789, 0.01]} rotation={[0, 0, 3.14]} scale={[0.999, 0.999, 0.999]}>
+        <meshPhysicalMaterial color="#222222" roughness={1} side={BackSide} />
       </mesh>
     </group>
   )

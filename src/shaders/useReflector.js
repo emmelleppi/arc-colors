@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { SavePass, RenderPass, LambdaPass, BlurPass } from 'postprocessing'
 import { useResource, useThree } from 'react-three-fiber'
 
-export default function useReflector(textureWidth = 100, textureHeight = 100) {
+export default function useReflector(textureWidth = 64, textureHeight = 64) {
   const meshRef = useResource()
   const floorRef = useResource()
   const [reflectorPlane] = useState(() => new THREE.Plane())
@@ -101,15 +101,15 @@ export default function useReflector(textureWidth = 100, textureHeight = 100) {
     const parameters = {
       minFilter: THREE.LinearFilter,
       magFilter: THREE.LinearFilter,
-      format: THREE.RGBFormat,
-      encoding: gl.outputEncoding
+      format: THREE.RGBFormat
     }
+
     const renderTarget = new THREE.WebGLRenderTarget(textureWidth, textureHeight, parameters)
     const renderPass = new RenderPass(scene, virtualCamera)
     const savePass = new SavePass(renderTarget)
     const lambdaPassBefore = new LambdaPass(beforeRender)
     const lambdaPassAfter = new LambdaPass(afterRender)
-    const blurPass = new BlurPass({ width: size.width / 2, height: size.height / 2 })
+    const blurPass = new BlurPass({ width: size.width, height: size.height / 4 })
     return [[lambdaPassBefore, renderPass, blurPass, savePass, lambdaPassAfter], { textureMatrix, tDiffuse: savePass.renderTarget.texture }]
   }, [size])
 
