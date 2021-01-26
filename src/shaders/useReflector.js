@@ -17,7 +17,7 @@ export default function useReflector(textureWidth = 64, textureHeight = 64) {
   const [q] = useState(() => new THREE.Vector4())
   const [textureMatrix] = useState(() => new THREE.Matrix4())
   const [virtualCamera] = useState(() => new THREE.PerspectiveCamera())
-  const { gl, size, scene, camera } = useThree()
+  const { size, scene, camera } = useThree()
 
   const beforeRender = useCallback(() => {
     if (!meshRef.current) return

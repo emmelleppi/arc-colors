@@ -65,7 +65,7 @@ export default function Screen({ color, opacity, ...props }) {
         <mesh geometry={nodes.Slice001.geometry} position={[0.97, 0.39, -0.91]} renderOrder={0} scale={[15, 1, 1]}>
           <a.meshPhysicalMaterial color="black" metalness={0} clearcoat={1} roughness={1} transparent opacity={springOpacity} />
         </mesh>
-        <a.mesh geometry={nodes.Slice.geometry} renderOrder={1}>
+        <a.mesh castShadow geometry={nodes.Slice.geometry} renderOrder={1}>
           <a.meshPhysicalMaterial
             transmission={1}
             metalness={0.1}

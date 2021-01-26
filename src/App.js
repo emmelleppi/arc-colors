@@ -4,13 +4,15 @@ import niceColorPalette from 'nice-color-palettes/1000'
 import { useSpring, a, useChain } from '@react-spring/three'
 import { Lethargy } from 'lethargy'
 import { useWheel as useGestureWheel } from 'react-use-gesture'
-import Model from './Color'
-import { Environment, Loader, Plane, Stats, useGLTF } from '@react-three/drei'
+import { Environment, Loader, Plane, Stats } from '@react-three/drei'
+
 import { MAX_INDEX, NUM, useWheel } from './store'
+import Model from './Color'
 import usePostprocessing from './shaders/usePostprocessing'
 import useReflector from './shaders/useReflector'
 import Screen from './Screen'
 import './shaders/materials/ReflectorMaterial'
+
 import './styles.css'
 
 function easeInOutExpo(x) {
@@ -84,7 +86,7 @@ function Floor() {
   usePostprocessing(passes)
   return (
     <group position-y={-2.5} rotation-x={-Math.PI / 2}>
-      <Plane ref={meshRef} args={[40, 40]} position={[0, 0, -0.001]}>
+      <Plane receiveShadow ref={meshRef} args={[40, 40]} position={[0, 0, -0.001]}>
         <reflectorMaterial transparent opacity={0.5} color="#000" {...reflectorProps} />
       </Plane>
     </group>
@@ -114,11 +116,10 @@ export default function App() {
     <>
       <Canvas
         concurrent
+        shadowMap
         pixelRatio={[1, 1.5]}
-        gl={{ powerPreference: 'high-performance', antialias: false, stencil: false, depth: false, alpha: false }}
         {...bind()}
         camera={{ fov: 20, far: 100, position: [0, -10, 50], zoom: 1.5 }}>
-        {/* <fog attach="fog" args={['#000', 55, 65]} /> */}
         <color attach="background" args={['#000']} />
         <group rotation={[Math.PI / 8, -Math.PI / 3.2, 0]} position-x={0}>
           <Suspense fallback={null}>
@@ -129,7 +130,7 @@ export default function App() {
           </Suspense>
         </group>
         <ambientLight intensity={0.5} />
-        <spotLight intensity={1} position={[10, 0, 10]} penumbra={0.1} angle={Math.PI / 4} distance={30} />
+        <spotLight intensity={2} position={[10, 0, 10]} penumbra={0.1} angle={Math.PI / 4} distance={30} castShadow />
       </Canvas>
       <Stats />
       <Loader />
