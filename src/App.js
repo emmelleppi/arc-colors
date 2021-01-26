@@ -1,11 +1,11 @@
 import React, { Suspense, useMemo, useRef } from 'react'
-import { Canvas, extend } from 'react-three-fiber'
+import { Canvas } from 'react-three-fiber'
 import niceColorPalette from 'nice-color-palettes/1000'
 import { useSpring, a, useChain } from '@react-spring/three'
 import { Lethargy } from 'lethargy'
 import { useWheel as useGestureWheel } from 'react-use-gesture'
 import Model from './Color'
-import { Environment, Loader, OrbitControls, Plane, Stats } from '@react-three/drei'
+import { Environment, Loader, Plane, Stats, useGLTF } from '@react-three/drei'
 import { MAX_INDEX, NUM, useWheel } from './store'
 import usePostprocessing from './shaders/usePostprocessing'
 import useReflector from './shaders/useReflector'
@@ -80,6 +80,7 @@ function Scene() {
 }
 
 function Floor() {
+  const { nodes, materials } = useGLTF('/prova1.glb')
   const [meshRef, floorRef, reflectorProps, passes] = useReflector()
   usePostprocessing(passes)
   return (
@@ -87,9 +88,14 @@ function Floor() {
       <Plane ref={meshRef} args={[40, 22]} position={[0, 0, -0.001]}>
         <reflectorMaterial transparent opacity={0.7} color="black" {...reflectorProps} />
       </Plane>
-      <Plane ref={floorRef} args={[70, 70]} receiveShadow>
-        <shadowMaterial color="#111" transparent opacity={0.2} />
-      </Plane>
+      <mesh
+        ref={floorRef}
+        position={[-2.3, -0.1, -0.001]}
+        rotation-x={Math.PI / 2}
+        geometry={nodes.Plane.geometry}
+        scale={[20.5, 20.5, 20.5]}>
+        <primitive object={materials['plane-mat']} attach="material" metalness={0} roughness={1} color="#555" />
+      </mesh>
     </group>
   )
 }
@@ -120,8 +126,9 @@ export default function App() {
         gl={{ powerPreference: 'high-performance' }}
         pixelRatio={[1, 1.5]}
         {...bind()}
-        shadowMap
-        camera={{ fov: 20, far: 100, position: [0, -10, 50], zoom: 1.5 }}>
+        camera={{ fov: 20, far: 100, position: [0, -10, 50], zoom: 1.75 }}>
+        <fog attach="fog" args={['#000', 50, 65]} />
+        <color attach="background" args={['#000']} />
         <group rotation={[Math.PI / 8, -Math.PI / 3.2, 0]} position-x={0}>
           <Suspense fallback={null}>
             <Scene />
@@ -130,20 +137,13 @@ export default function App() {
             <Floor />
           </Suspense>
         </group>
-
-        <ambientLight intensity={0.1} />
+        <ambientLight intensity={1.5} />
         <spotLight
-          position={[20, 1, 10]}
-          intensity={1.5}
-          castShadow
+          position={[20, 20, 20]}
+          intensity={1}
           penumbra={1}
-          distance={60}
-          angle={Math.PI / 6}
-          shadow-mapSize-width={518}
-          shadow-mapSize-height={518}
+          distance={30}
         />
-        <spotLight position={[10, 40, 0]} intensity={5} penumbra={1} distance={45} angle={Math.PI / 3} />
-
       </Canvas>
       <Stats />
       <Loader />
