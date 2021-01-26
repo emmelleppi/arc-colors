@@ -50,7 +50,7 @@ function Scene() {
 
   const { rotY } = useSpring({
     ref: springRotY,
-    rotY: wheelOpen ? Math.PI / 3 : Math.PI / 2
+    rotY: wheelOpen ? Math.PI / 4 : Math.PI / 2
   })
   const { posX, posZ } = useSpring({
     ref: springPosX,
@@ -80,21 +80,21 @@ function Scene() {
 }
 
 function Floor() {
-  const { nodes, materials } = useGLTF('/prova1.glb')
+  const { nodes, materials } = useGLTF('/colors.glb')
   const [meshRef, floorRef, reflectorProps, passes] = useReflector()
   usePostprocessing(passes)
   return (
     <group position-y={-2.5} rotation-x={-Math.PI / 2}>
       <Plane ref={meshRef} args={[40, 22]} position={[0, 0, -0.001]}>
-        <reflectorMaterial transparent opacity={0.7} color="black" {...reflectorProps} />
+        <reflectorMaterial transparent opacity={1} color="black" {...reflectorProps} />
       </Plane>
       <mesh
         ref={floorRef}
-        position={[-2.3, -0.1, -0.001]}
+        position={[-2.3, -0.1, -0.01]}
         rotation-x={Math.PI / 2}
-        geometry={nodes.Plane.geometry}
-        scale={[20.5, 20.5, 20.5]}>
-        <primitive object={materials['plane-mat']} attach="material" metalness={0} roughness={1} color="#555" />
+        scale={[1.8,1.8,1.8]}
+        geometry={nodes.Plane.geometry}>
+        <primitive object={materials['Plane-mat']} attach="material" metalness={0} roughness={1} color="#555" />
       </mesh>
     </group>
   )
@@ -127,23 +127,17 @@ export default function App() {
         pixelRatio={[1, 1.5]}
         {...bind()}
         camera={{ fov: 20, far: 100, position: [0, -10, 50], zoom: 1.75 }}>
-        <fog attach="fog" args={['#000', 50, 65]} />
+        <fog attach="fog" args={['#000', 60, 70]} />
         <color attach="background" args={['#000']} />
         <group rotation={[Math.PI / 8, -Math.PI / 3.2, 0]} position-x={0}>
           <Suspense fallback={null}>
             <Scene />
             <Model position={[-2.5, -2.5, 0]} scale={[1.8, 1.8, 1.8]} />
-            <Environment files="adams_place_bridge_1k.hdr" />
+            <Environment files="lightroom_14b.hdr" />
             <Floor />
           </Suspense>
         </group>
         <ambientLight intensity={1.5} />
-        <spotLight
-          position={[20, 20, 20]}
-          intensity={1}
-          penumbra={1}
-          distance={30}
-        />
       </Canvas>
       <Stats />
       <Loader />

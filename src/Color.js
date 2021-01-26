@@ -24,13 +24,13 @@ function Cylinder({ i, material, ...props }) {
 
   return (
     <mesh ref={ref} onClick={handleClick} {...props}>
-      <primitive object={material} attach="material" metalness={0.3} roughness={0.4} color={palette[paletteIndex]} />
+      <primitive object={material} attach="material" metalness={0.6} roughness={0.3} color={palette[paletteIndex]} />
     </mesh>
   )
 }
 
 export default function Model(props) {
-  const { nodes, materials } = useGLTF('/prova1.glb')
+  const { nodes, materials } = useGLTF('/colors.glb')
   const { nodes: screenNode } = useGLTF('/Screen.gltf')
 
   return (
@@ -40,20 +40,19 @@ export default function Model(props) {
           <Cylinder
             key={`0${index}`}
             i={index}
-            rotation-x={Math.PI}
-            rotation-y={0}
-            rotation-z={Math.PI / 2}
+            rotation-x={Math.PI/2}
+            rotation-y={-Math.PI/2}
             geometry={nodes[`Cylinder${index === 0 ? '' : index < 10 ? `00${index}` : `0${index}`}`].geometry}
-            material={materials.Ma.clone()}
+            material={materials[`Material.${index===0 ? "037" : (index+1) < 10 ? `00${index+1}` : `0${index+1}`}`]}
           />
         ))}
       </group>
       <Screen />
-      <mesh geometry={nodes.Cube.geometry} position={[0, 1, 0]} rotation-x={Math.PI}>
-        <primitive object={materials.black} attach="material" metalness={0} roughness={0.7} />
+      <mesh geometry={nodes.Cube.geometry} position={[0, 1, 0]} rotation-x={Math.PI/2}>
+        <primitive object={materials.black} attach="material" metalness={0} roughness={0.5} />
       </mesh>
       <mesh geometry={screenNode.Slice.geometry} position={[1.79, 1.789, 0.01]} rotation={[0,0,3.14]} scale={[0.999,0.999,0.999]} >
-        <meshPhysicalMaterial color="#1a1a1a" roughness={1} side={BackSide}/>
+        <meshPhysicalMaterial color="#222222" roughness={1} side={BackSide}/>
       </mesh>
     </group>
   )
