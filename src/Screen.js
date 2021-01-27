@@ -7,57 +7,62 @@ import { useGLTF } from '@react-three/drei/useGLTF'
 import { useSpring, a } from '@react-spring/three'
 import { useFrame } from 'react-three-fiber'
 import lerp from 'lerp'
+import niceColorPalette from 'nice-color-palettes/1000'
 import { useWheel } from './store'
 
-export default function Screen({ color, opacity, ...props }) {
+export default function Screen({ wheelIndex, opacity, ...props }) {
   const ref = useRef()
   const { nodes } = useGLTF('/Screen.gltf')
   const scale = opacity === 1 ? 1.4 : 1
+  const setWheelIndex = useWheel((s) => s.setWheelIndex)
   const toggle = useWheel((s) => s.toggleWheel)
   const wheelOpen = useWheel((s) => s.wheelOpen)
   const setPalette = useWheel((s) => s.setPalette)
   const [localOpen, setLocalOpen] = useState(wheelOpen)
-  const [isVisible, setIsVisible] = useState(false)
+  const color = niceColorPalette[wheelIndex]
 
-  useFrame(() => {
-    const newScale = lerp(ref.current.scale.x, scale, 0.1)
-    ref.current.scale.set(newScale, newScale, newScale)
-  })
   const springOpacityRef = useRef()
   const { springOpacity } = useSpring({
     ref: springOpacityRef,
-    springOpacity: opacity
+    springOpacity: opacity === 1 ? 1 : 0,
   })
 
-  useEffect(async () => {
-    if (localOpen) {
-      await springOpacityRef.current.start({
-        springOpacity: opacity
-      })
-      if (!wheelOpen) {
-        setLocalOpen(false)
-        setIsVisible(false)
+  useEffect(() => {
+    if (wheelOpen) {
+      if (localOpen) {
+        springOpacityRef.current.start({
+          springOpacity: opacity,
+        })
+      }else {
+        springOpacityRef.current.start({
+          springOpacity: opacity,
+          delay: 1000,
+          onRest: () => setLocalOpen(true)
+        })
       }
     } else {
-      await springOpacityRef.current.start({
-        springOpacity: opacity,
-        onStart: () => setIsVisible(true),
-        onRest: () => setLocalOpen(true)
+      springOpacityRef.current.start({
+        springOpacity: opacity === 1 ? 1 : 0,
+        onRest: () => setLocalOpen(false)
       })
     }
     if (opacity === 1) {
       setPalette(color)
     }
-  }, [localOpen, setIsVisible, setLocalOpen, wheelOpen, opacity, setPalette, color])
+  }, [localOpen, setLocalOpen, wheelOpen, opacity, setPalette, color])
+
+  useFrame(() => {
+    const newScale = lerp(ref.current.scale.x, scale, 0.1)
+    ref.current.scale.set(newScale, newScale, newScale)
+  })
 
   return (
     <group
-      visible={opacity > 0.01 && (isVisible || opacity === 1)}
+      visible={opacity > 0.01}
       onClick={(e) => {
         e.stopPropagation()
-        if (opacity === 1) {
-          toggle()
-        }
+        setWheelIndex(wheelIndex)
+        toggle()
       }}
       ref={ref}
       {...props}>

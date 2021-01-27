@@ -1,6 +1,5 @@
 import React, { Suspense, useMemo, useRef } from 'react'
 import { Canvas } from 'react-three-fiber'
-import niceColorPalette from 'nice-color-palettes/1000'
 import { useSpring, a, useChain } from '@react-spring/three'
 import { Lethargy } from 'lethargy'
 import { useWheel as useGestureWheel } from 'react-use-gesture'
@@ -28,11 +27,11 @@ function Scene() {
   const wheelIndex = useWheel((s) => s.wheelIndex)
   const _weel = (2 * Math.PI * wheelIndex) / NUM
   const [positions, colors, alpha] = useMemo(() => {
+    const _wheelIndex = wheelIndex -NUM/2
     let colors = new Array(NUM)
       .fill()
-      .map((_, i) => Math.abs((wheelIndex + i > 0 ? wheelIndex + i : MAX_INDEX + wheelIndex + i) % MAX_INDEX))
+      .map((_, i) => Math.abs((_wheelIndex + i > 0 ? _wheelIndex + i : MAX_INDEX + _wheelIndex + i) % MAX_INDEX))
     let alpha = new Array(NUM).fill().map((_, i) => easeInOutExpo(1 - (2 * Math.abs(i - NUM / 2)) / NUM))
-
     for (let i = 0; i < Math.abs(wheelIndex % NUM); i += 1) {
       const a = alpha.pop()
       const el = colors.pop()
@@ -40,13 +39,9 @@ function Scene() {
       alpha = [a, ...alpha]
     }
 
-    if (!wheelOpen) {
-      alpha = alpha.map((a) => (a === 1 ? 1 : 0))
-    }
-
     const positions = new Array(NUM)
       .fill()
-      .map((_, index) => [0, -2 * Math.sin((2 * Math.PI * index) / NUM), -2 * Math.cos((2 * Math.PI * index) / NUM)])
+      .map((_, index) => [0, -2 * Math.sin((2 * Math.PI * (index)) / NUM), -2 * Math.cos((2 * Math.PI * index) / NUM)])
     return [positions, colors, alpha]
   }, [wheelIndex, wheelOpen])
 
@@ -71,7 +66,7 @@ function Scene() {
           <Screen
             key={`0${index}`}
             position={pos}
-            color={niceColorPalette[colors[index]]}
+            wheelIndex={colors[index]}
             rotation-x={-(2 * Math.PI * index) / NUM}
             opacity={alpha[index]}
           />

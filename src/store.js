@@ -57,6 +57,7 @@ export const useWheel = create(
       }),
 
     setPalette: (palette) => set({ palette }),
+    setWheelIndex: (wheelIndex) => set({wheelIndex}),
     increaseWheelIndex: () => set((state) => ({ wheelIndex: state.wheelIndex + 1 })),
     decreaseWheelIndex: () => set((state) => ({ wheelIndex: state.wheelIndex - 1 })),
     toggleWheel: () => set((state) => ({ wheelOpen: !state.wheelOpen }))

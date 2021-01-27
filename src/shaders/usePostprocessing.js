@@ -37,7 +37,7 @@ export default function usePostprocessing(extra = []) {
       pass.setSize(512, 512)
     })
     return [composer, composer2]
-  }, [])
+  }, [gl, extra,scene, camera])
 
   useFrame((_, delta) => {
     composer2.render(delta)
