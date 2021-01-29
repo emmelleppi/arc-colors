@@ -1,6 +1,7 @@
 import create from 'zustand'
 import niceColorPalette from 'nice-color-palettes/1000'
 import produce from 'immer'
+import debounce from 'lodash.debounce'
 
 export const MAX_INDEX = 900
 export const INIT_INDEX = MAX_INDEX / 2 + (Math.random() > 0.5 ? -1 : 1) * Math.round(200 * Math.random())
@@ -58,8 +59,8 @@ export const useWheel = create(
 
     setPalette: (palette) => set({ palette }),
     setWheelIndex: (wheelIndex) => set({wheelIndex}),
-    increaseWheelIndex: () => set((state) => ({ wheelIndex: state.wheelIndex + 1 })),
-    decreaseWheelIndex: () => set((state) => ({ wheelIndex: state.wheelIndex - 1 })),
+    increaseWheelIndex: debounce(() => set((state) => ({ wheelIndex: state.wheelIndex + 1 })), 20),
+    decreaseWheelIndex: debounce(() => set((state) => ({ wheelIndex: state.wheelIndex - 1 })), 20),
     toggleWheel: () => set((state) => ({ wheelOpen: !state.wheelOpen }))
   }))
 )

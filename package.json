@@ -10,6 +10,7 @@
     "immer": "^8.0.1",
     "lerp": "1.0.3",
     "lethargy": "1.0.9",
+    "lodash.debounce": "^4.0.8",
     "nice-color-palettes": "3.0.0",
     "postprocessing": "^6.20.0",
     "react": "17.0.1",

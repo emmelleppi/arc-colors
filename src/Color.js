@@ -63,7 +63,7 @@ export default function Model(props) {
         <primitive object={materials.black} attach="material" metalness={bodyMetalness} roughness={bodyRoughness} color={bodyColor}/>
       </mesh>
       <mesh geometry={screenNode.Slice.geometry} position={[1.79, 1.789, 0.01]} rotation={[0, 0, 3.14]} scale={[0.999, 0.999, 0.999]}>
-        <meshPhysicalMaterial color="#222222" roughness={1} side={BackSide} />
+        <meshPhysicalMaterial color="#111" roughness={1} side={BackSide} />
       </mesh>
     </group>
   )

@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useFrame, useThree } from 'react-three-fiber'
 import {
   EffectComposer,
@@ -7,7 +7,7 @@ import {
   SavePass,
 } from 'postprocessing'
 export default function usePostprocessing(extra = []) {
-  const { gl, scene, camera } = useThree()
+  const { gl, size, scene, camera } = useThree()
 
   const [composer, composer2] = useMemo(() => {
     const composer = new EffectComposer(gl, {
@@ -24,7 +24,7 @@ export default function usePostprocessing(extra = []) {
       magFilter: THREE.LinearFilter,
       format: THREE.RGBFormat
     }
-    const renderTarget = new THREE.WebGLRenderTarget(512, 512, parameters)
+    const renderTarget = new THREE.WebGLRenderTarget(1024, 1024, parameters)
     const composer2 = new EffectComposer(null)
     composer2.autoRenderToScreen = false
     composer2.renderer = gl
@@ -34,10 +34,12 @@ export default function usePostprocessing(extra = []) {
     composer2.autoRenderToScreen = false
     extra.forEach((pass) => {
       composer2.addPass(pass)
-      pass.setSize(512, 512)
+      pass.setSize(256, 256)
     })
     return [composer, composer2]
   }, [gl, extra,scene, camera])
+
+  useEffect(() => composer.setSize(size.width, size.height), [composer, size])
 
   useFrame((_, delta) => {
     composer2.render(delta)

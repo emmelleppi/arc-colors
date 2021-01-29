@@ -1,8 +1,8 @@
-import React, { Suspense, useMemo, useRef } from 'react'
+import React, { Suspense, useMemo, useRef, useState } from 'react'
 import { Canvas } from 'react-three-fiber'
 import { useSpring, a, useChain } from '@react-spring/three'
 import { Lethargy } from 'lethargy'
-import { useWheel as useGestureWheel } from 'react-use-gesture'
+import { useDrag, useGesture, useWheel as useGestureWheel } from 'react-use-gesture'
 import { Environment, Loader, Plane, Stats } from '@react-three/drei'
 
 import { MAX_INDEX, NUM, useWheel } from './store'
@@ -89,23 +89,30 @@ function Floor() {
 }
 
 export default function App() {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
   const wheelOpen = useWheel((s) => s.wheelOpen)
   const increaseWheelIndex = useWheel((s) => s.increaseWheelIndex)
   const decreaseWheelIndex = useWheel((s) => s.decreaseWheelIndex)
 
-  const bind = useGestureWheel(({ event, last, memo: wait }) => {
-    if (!last && wheelOpen) {
-      const s = lethargy.check(event)
-      if (s) {
-        if (!wait) {
+  const bind = useGesture({
+    onWheel: ({ event, last }) => {
+      if (!last && wheelOpen) {
+        const s = lethargy.check(event)
+        if (s) {
           s > 0 ? increaseWheelIndex() : decreaseWheelIndex()
           return true
-        }
-      } else return false
-    } else {
-      return false
-    }
-  })
+        } else return false
+      } else {
+        return false
+      }
+    },
+    // onDrag: ({ active, delta: [,my], direction: [,yDir] }) => {
+    //   console.log("aaa")
+    //   if (active && Math.abs(my) > 0.5) {
+    //     yDir > 0 ? increaseWheelIndex() : decreaseWheelIndex()
+    //   }
+    // }
+  }, { axis: 'y', dragDelay: 1000 })
 
   return (
     <>
@@ -113,8 +120,8 @@ export default function App() {
         concurrent
         shadowMap
         pixelRatio={[1, 1.5]}
-        {...bind()}
-        camera={{ fov: 20, far: 100, position: [0, -10, 50], zoom: 1.5 }}>
+        {...(wheelOpen && bind())}
+        camera={{ fov: 20, far: 100, position: [0, -10, 50], zoom: isMobile ? 1 : 1.5 }}>
         <color attach="background" args={['#000']} />
         <group rotation={[Math.PI / 8, -Math.PI / 3.2, 0]} position-x={0}>
           <Suspense fallback={null}>
