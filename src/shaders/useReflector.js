@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { SavePass, RenderPass, DepthPass, LambdaPass, BlurPass } from 'postprocessing'
 import { useResource, useThree } from 'react-three-fiber'
 
-export default function useReflector(textureWidth = 128, textureHeight = 128) {
+export default function useReflector(textureWidth = 64, textureHeight = 64) {
   const meshRef = useResource()
   const [reflectorPlane] = useState(() => new THREE.Plane())
   const [normal] = useState(() => new THREE.Vector3())
@@ -109,8 +109,16 @@ export default function useReflector(textureWidth = 128, textureHeight = 128) {
     const depthPass = new DepthPass(scene, virtualCamera)
     const lambdaPassBefore = new LambdaPass(beforeRender)
     const lambdaPassAfter = new LambdaPass(afterRender)
-    const blurPass = new BlurPass({ width: size.width * 0.75, height: size.height * 0.75 })
-    return [[lambdaPassBefore, renderPass, savePass, blurPass, saveBlurPass ,depthPass, lambdaPassAfter], { textureMatrix, tDiffuse: savePass.renderTarget.texture, tDepth: depthPass.renderTarget.texture,  tBlur: saveBlurPass.renderTarget.texture }]
+    const blurPass = new BlurPass({ width: size.width * 0.75, height: size.height * 0.5 })
+    return [
+      [lambdaPassBefore, renderPass, savePass, blurPass, saveBlurPass, depthPass, lambdaPassAfter],
+      {
+        textureMatrix,
+        tDiffuse: savePass.renderTarget.texture,
+        tDepth: depthPass.renderTarget.texture,
+        tBlur: saveBlurPass.renderTarget.texture
+      }
+    ]
   }, [size])
 
   return [meshRef, props, passes]

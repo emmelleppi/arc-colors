@@ -1,85 +1,59 @@
-import { extend } from 'react-three-fiber'
-import { Color, MeshBasicMaterial } from 'three'
+import { useTexture } from '@react-three/drei'
+import M from 'component-material'
+import { useEffect } from 'react'
+import { RepeatWrapping } from 'three'
 
-class ReflectorMaterial extends MeshBasicMaterial {
-  _tDiffuse
-  _tDepth
-  _tBlur
-  _textureMatrix
-  constructor(parameters = {}) {
-    super(parameters)
-    this.setValues(parameters)
-    this._tDepth = { value: null }
-    this._tBlur = { value: null }
-    this._tDiffuse = { value: null }
-    this._textureMatrix = { value: null }
-  }
-
-  onBeforeCompile(shader) {
-    shader.uniforms.tDiffuse = this._tDiffuse
-    shader.uniforms.tDepth = this._tDepth
-    shader.uniforms.tBlur = this._tBlur
-    shader.uniforms.textureMatrix = this._textureMatrix
-
-    shader.vertexShader = `
-        uniform mat4 textureMatrix;
-        varying vec4 my_vUv;
-     
-      ${shader.vertexShader}
-    `
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <project_vertex>',
-      `
-        #include <project_vertex>
+export default function ReflectorMaterial({ tDiffuse, tDepth, tBlur, textureMatrix, ...props }) {
+  const textures = useTexture(['/normal_floor.jpeg', '/roughness_floor.jpeg'])
+  useEffect(() => {
+    textures.forEach((t) => {
+      t.wrapS = t.wrapT = RepeatWrapping
+      t.repeat.set(0.5, 0.5)
+    })
+  }, [textures])
+  return (
+    <M
+      {...props}
+      normalMap={textures[0]}
+      roughnessMap={textures[1]}
+      metalness={0}
+      roughness={1}
+      envMapIntensity={0}
+      color="black"
+      uniforms={{
+        tDiffuse: { type: 'sampler2D', value: tDiffuse },
+        tDepth: { type: 'sampler2D', value: tDepth },
+        tBlur: { type: 'sampler2D', value: tBlur },
+        textureMatrix: { type: 'mat4', value: textureMatrix }
+      }}
+      varyings={{ my_vUv: { type: 'vec4' } }}>
+      <M.Vert.Body>{`
         my_vUv = textureMatrix * vec4( position, 1.0 );
         gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-        `
-    )
-
-    shader.fragmentShader = `
-        uniform sampler2D tDiffuse;
-        uniform sampler2D tDepth;
-        uniform sampler2D tBlur;
-        varying vec4 my_vUv;
-        ${shader.fragmentShader}
-    `
-    shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <dithering_fragment>',
-      `
-        #include <dithering_fragment>
+      `}</M.Vert.Body>
+      <M.Frag.emissivemap_fragment>{`
         vec3 coord = my_vUv.xyz / my_vUv.w;
         vec4 base = sRGBToLinear(texture2DProj( tDiffuse, my_vUv ));
         vec4 depth = sRGBToLinear(texture2DProj( tDepth, my_vUv ));
         vec4 blur = sRGBToLinear(texture2DProj( tBlur, my_vUv ));
-        float depthFactor = smoothstep(0.75, 1.0, 1.0-depth.a);
-        gl_FragColor.rgb = mix(blur,base, 0.75 * depthFactor).rgb;
-      `
-    )
-  }
-  get tDiffuse() {
-    return this._tDiffuse.value
-  }
-  set tDiffuse(v) {
-    this._tDiffuse.value = v
-  }
-  get tDepth() {
-    return this._tDepth.value
-  }
-  set tDepth(v) {
-    this._tDepth.value = v
-  }
-  get tBlur() {
-    return this._tBlur.value
-  }
-  set tBlur(v) {
-    this._tBlur.value = v
-  }
-  get textureMatrix() {
-    return this._textureMatrix.value
-  }
-  set textureMatrix(v) {
-    this._textureMatrix.value = v
-  }
-}
 
-extend({ ReflectorMaterial })
+        float depthFactor = smoothstep(0.5, 2.0, 1.0-depth.a);
+        depthFactor *= 2.0;
+        depthFactor = min(1.0, depthFactor);
+
+        float reflectorRoughnessFactor = roughness;
+        #ifdef USE_ROUGHNESSMAP
+          vec4 reflectorTexelRoughness = texture2D( roughnessMap, vUv );
+          reflectorRoughnessFactor *= reflectorTexelRoughness.g;
+        #endif
+        reflectorRoughnessFactor = min(1.0, reflectorRoughnessFactor);
+        reflectorRoughnessFactor = smoothstep(0.0, 0.5, reflectorRoughnessFactor);
+        
+        base.rgb = mix(diffuseColor, base, 0.9).rgb;
+        vec4 merge = mix(blur, base, depthFactor);
+        merge = mix(merge, blur, reflectorRoughnessFactor);
+        diffuseColor.rgb = merge.rgb;        
+      `}</M.Frag.emissivemap_fragment>
+    </M>
+  )
+}

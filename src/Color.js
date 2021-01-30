@@ -33,14 +33,14 @@ function Cylinder({ i, material, metalness, roughness, ...props }) {
 export default function Model(props) {
   const { nodes, materials } = useGLTF('/colors.glb')
   const { nodes: screenNode } = useGLTF('/Screen.gltf')
-  const { bodyColor,bodyMetalness, bodyRoughness, cylindersMetalness, cylindersRoughness } = useTweaks({
+  const { bodyColor, bodyMetalness, bodyRoughness, cylindersMetalness, cylindersRoughness } = useTweaks({
     bodyMetalness: { value: 0, min: 0, max: 1 },
     bodyRoughness: { value: 1, min: 0, max: 1 },
-    bodyColor: "#FFFFFF",
+    bodyColor: '#FFFFFF',
     ...makeSeparator(),
     cylindersMetalness: { value: 0, min: 0, max: 1 },
-    cylindersRoughness: { value: 1, min: 0, max: 1 },
-  });
+    cylindersRoughness: { value: 1, min: 0, max: 1 }
+  })
 
   return (
     <group {...props} dispose={null}>
@@ -60,7 +60,7 @@ export default function Model(props) {
       </group>
       <Screen />
       <mesh receiveShadow geometry={nodes.Cube.geometry} position={[0, 1, 0]} rotation-x={Math.PI / 2}>
-        <primitive object={materials.black} attach="material" metalness={bodyMetalness} roughness={bodyRoughness} color={bodyColor}/>
+        <primitive object={materials.black} attach="material" metalness={bodyMetalness} roughness={bodyRoughness} color={bodyColor} />
       </mesh>
       <mesh geometry={screenNode.Slice.geometry} position={[1.79, 1.789, 0.01]} rotation={[0, 0, 3.14]} scale={[0.999, 0.999, 0.999]}>
         <meshPhysicalMaterial color="#111" roughness={1} side={BackSide} />
