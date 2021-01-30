@@ -5,6 +5,7 @@
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
+    "@pmndrs/branding": "^0.0.7",
     "@react-spring/three": "9.0.0-rc.3",
     "@react-three/drei": "2.2.16",
     "component-material": "^1.0.6",

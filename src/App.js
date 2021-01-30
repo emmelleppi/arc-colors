@@ -1,11 +1,10 @@
-import React, { Suspense, useCallback, useMemo, useRef, useState } from 'react'
-import { Canvas, useFrame } from 'react-three-fiber'
+import React, { Suspense, useCallback, useMemo, useRef } from 'react'
+import { Canvas } from 'react-three-fiber'
 import { useSpring, a, useChain } from '@react-spring/three'
-import { Lethargy } from 'lethargy'
 import { useGesture } from 'react-use-gesture'
-import { Environment, Loader, Plane, Stats, Text } from '@react-three/drei'
-import lerp from 'lerp'
+import { Environment, Loader, Plane, Stats } from '@react-three/drei'
 import useCopyClipboard from 'react-use-clipboard'
+import { Footer } from '@pmndrs/branding'
 
 import { MAX_INDEX, NUM, useWheel } from './store'
 import Model from './Color'
@@ -18,8 +17,6 @@ import './styles.css'
 function easeInOutExpo(x) {
   return x === 0 ? 0 : x === 1 ? 1 : x < 0.5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2
 }
-
-const lethargy = new Lethargy()
 
 function Scene() {
   const springRotY = useRef()
@@ -82,17 +79,21 @@ function Floor() {
   usePostprocessing(passes)
   return (
     <group position-y={-2.5} rotation-x={-Math.PI / 2}>
-      <Plane receiveShadow ref={meshRef} args={[18, 18]} position={[3, -2, -0.001]}>
-        <ReflectorMaterial transparent opacity={1} {...reflectorProps} />
+      <Plane ref={meshRef} args={[25, 25]} position={[3, -2, -0.001]}>
+        <ReflectorMaterial {...reflectorProps} />
       </Plane>
-      <Share />
     </group>
   )
 }
 
-function Share() {
-  const ref = useRef()
-  const [hover, setHover] = useState(false)
+export default function App() {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+  const height = document.documentElement.scrollHeight
+
+  const tempWheel = useRef(0)
+  const wheelOpen = useWheel((s) => s.wheelOpen)
+  const increaseWheelIndex = useWheel((s) => s.increaseWheelIndex)
+  const decreaseWheelIndex = useWheel((s) => s.decreaseWheelIndex)
   const [isCopied, setCopied] = useCopyClipboard(window.location.href, {
     successDuration: 2000
   })
@@ -104,46 +105,28 @@ function Share() {
     },
     [setCopied]
   )
-
-  useFrame(({ clock }) => {
-    ref.current.position.z = lerp(ref.current.position.z, 0.1 + 0.05 * Math.sin(clock.elapsedTime) + (hover ? 0.5 : 0), 0.1)
-    ref.current.rotation.y = lerp(ref.current.rotation.y, hover ? Math.PI / 2 : 0, 0.1)
-  })
-
-  return (
-    <Text
-      ref={ref}
-      onPointerOver={() => setHover(true)}
-      onPointerOut={() => setHover(false)}
-      onClick={handleClick}
-      font="https://fonts.gstatic.com/s/archivoblack/v10/HTxqL289NzCGg4MzN6KJ7eW6CYyF-A.woff"
-      fontSize={0.8}
-      position={[1, -2.5, 0.1]}
-      rotation={[0, 0, Math.PI / 2]}>
-      {isCopied ? 'COPIED!' : 'SHARE'}
-    </Text>
-  )
-}
-
-export default function App() {
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-  const wheelOpen = useWheel((s) => s.wheelOpen)
-  const increaseWheelIndex = useWheel((s) => s.increaseWheelIndex)
-  const decreaseWheelIndex = useWheel((s) => s.decreaseWheelIndex)
-
   const bind = useGesture(
     {
-      onWheel: ({ event, last }) => {
-        if (!last && wheelOpen) {
-          const s = lethargy.check(event)
-          if (s) {
-            s > 0 ? increaseWheelIndex() : decreaseWheelIndex()
-          }
+      onWheel: ({ xy: [, y] }) => {
+        const scroll = parseInt((y / (2 * height)) * 10, 10)
+        if (scroll > tempWheel.current) {
+          decreaseWheelIndex()
+          tempWheel.current = scroll
+        }
+        if (scroll < tempWheel.current) {
+          increaseWheelIndex()
+          tempWheel.current = scroll
         }
       },
-      onDrag: ({ active, delta: [, my], direction: [, yDir] }) => {
-        if (active && Math.abs(my) > 0.5) {
-          yDir > 0 ? increaseWheelIndex() : decreaseWheelIndex()
+      onDrag: ({ xy: [, y] }) => {
+        const scroll = parseInt((y / height) * 10, 10)
+        if (scroll > tempWheel.current) {
+          increaseWheelIndex()
+          tempWheel.current = scroll
+        }
+        if (scroll < tempWheel.current) {
+          decreaseWheelIndex()
+          tempWheel.current = scroll
         }
       }
     },
@@ -152,8 +135,9 @@ export default function App() {
 
   return (
     <div {...(wheelOpen && bind())} style={{ height: '100%' }}>
-      <Canvas concurrent shadowMap pixelRatio={[1, 1.5]} camera={{ fov: 20, far: 100, position: [0, -10, 50], zoom: isMobile ? 1 : 1.5 }}>
+      <Canvas concurrent pixelRatio={[1, 1.5]} camera={{ fov: 20, far: 100, position: [0, -10, 50], zoom: isMobile ? 1 : 1.5 }}>
         <color attach="background" args={['#000']} />
+        <fog attach="fog" args={['#000', 50, 60]} />
         <group rotation={[Math.PI / 8, -Math.PI / 3.2, 0]} position-x={0}>
           <Suspense fallback={null}>
             <Scene />
@@ -162,11 +146,17 @@ export default function App() {
             <Floor />
           </Suspense>
         </group>
-        <ambientLight intensity={0.5} />
-        <spotLight intensity={2} position={[10, 0, 10]} penumbra={0.1} angle={Math.PI / 4} distance={30} castShadow />
+        <ambientLight intensity={1} />
+        <spotLight intensity={2} position={[10, 0, 10]} penumbra={0.1} angle={Math.PI / 4} distance={30} />
       </Canvas>
       <Stats />
       <Loader />
+      <Footer
+        date="30. January"
+        year="2021"
+        link1={<a onClick={handleClick}>Share your composition</a>}
+        link2={isCopied && <div>Link copied in clipboard!</div>}
+      />
     </div>
   )
 }

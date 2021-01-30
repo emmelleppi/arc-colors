@@ -74,12 +74,12 @@ export default function Screen({ wheelIndex, opacity, ...props }) {
   )
 
   return (
-    <group visible={opacity > 0.01} onClick={handleClick} ref={ref} {...props}>
+    <group visible={opacity > 0.01} onClick={handleClick} ref={ref} scale={[scale, scale, scale]} {...props}>
       <group position={[1, -0.51, 1]} scale={[1.27, 1.27, 1.27]} dispose={null} rotation={[0, Math.PI / 2, 0]}>
         <mesh geometry={nodes.Slice001.geometry} position={[0.97, 0.39, -0.91]} renderOrder={0} scale={[15, 1, 1]}>
           <a.meshPhysicalMaterial color="black" metalness={1} clearcoat={1} roughness={1} transparent opacity={springOpacity} />
         </mesh>
-        <a.mesh castShadow geometry={nodes.Slice.geometry} renderOrder={1}>
+        <a.mesh geometry={nodes.Slice.geometry} renderOrder={1}>
           <a.meshPhysicalMaterial
             transmission={1}
             metalness={0}
@@ -95,7 +95,7 @@ export default function Screen({ wheelIndex, opacity, ...props }) {
         ? color.map((c, i) => (
             <mesh key={`0${i}`} position-x={(i - 2.5) / 3.8} position-z={-0.24} renderOrder={0}>
               <boxBufferGeometry args={[0.265, 0.8, 0.02]} />
-              <a.meshStandardMaterial color={c} transparent opacity={springOpacity} metalness={0} roughness={1} />
+              <a.meshStandardMaterial color={c} transparent opacity={springOpacity} metalness={1} roughness={0.95} />
             </mesh>
           ))
         : null}

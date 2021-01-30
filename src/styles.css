@@ -1,3 +1,5 @@
+@import url('@pmndrs/branding/styles.css');
+
 * {
   box-sizing: border-box;
 }
@@ -9,6 +11,7 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: auto;
   touch-action: none;
+  overflow: hidden;
+  overscroll-behavior: none;
 }

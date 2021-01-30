@@ -20,7 +20,7 @@ export default function usePostprocessing(extra = []) {
       magFilter: THREE.LinearFilter,
       format: THREE.RGBFormat
     }
-    const renderTarget = new THREE.WebGLRenderTarget(size.width / 4, size.height / 4, parameters)
+    const renderTarget = new THREE.WebGLRenderTarget(size.width / 2, size.height / 2, parameters)
     const composer2 = new EffectComposer(null)
     composer2.renderer = gl
     composer2.inputBuffer = renderTarget
@@ -29,7 +29,7 @@ export default function usePostprocessing(extra = []) {
     composer2.autoRenderToScreen = false
     extra.forEach((pass) => {
       composer2.addPass(pass)
-      pass.setSize(size.width / 4, size.height / 4)
+      pass.setSize(size.width / 2, size.height / 2)
     })
     return [composer, composer2]
   }, [gl, extra, scene, camera])

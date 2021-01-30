@@ -18,8 +18,8 @@ export default function ReflectorMaterial({ tDiffuse, tDepth, tBlur, textureMatr
       roughnessMap={textures[1]}
       metalness={0}
       roughness={1}
-      envMapIntensity={0}
-      color="black"
+      envMapIntensity={0.001}
+      transparent
       uniforms={{
         tDiffuse: { type: 'sampler2D', value: tDiffuse },
         tDepth: { type: 'sampler2D', value: tDepth },
@@ -49,10 +49,10 @@ export default function ReflectorMaterial({ tDiffuse, tDepth, tBlur, textureMatr
         reflectorRoughnessFactor = min(1.0, reflectorRoughnessFactor);
         reflectorRoughnessFactor = smoothstep(0.0, 0.5, reflectorRoughnessFactor);
         
-        base.rgb = mix(diffuseColor, base, 0.9).rgb;
+        base.rgb = mix(diffuseColor, base, 0.8).rgb;
         vec4 merge = mix(blur, base, depthFactor);
         merge = mix(merge, blur, reflectorRoughnessFactor);
-        diffuseColor.rgb = merge.rgb;        
+        diffuseColor.rgb *= 0.003 + 0.997* sRGBToLinear(merge).rgb;        
       `}</M.Frag.emissivemap_fragment>
     </M>
   )
